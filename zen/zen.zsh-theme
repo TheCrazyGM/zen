@@ -8,7 +8,7 @@
 #    /     /\  ___/|   |  \   |    |   |   Y  \  ___/|  Y Y  \  ___/   #
 #   /_______ \___  >___|  /   |____|   |___|  /\___  >__|_|  /\___  >  #
 #           \/   \/     \/                  \/     \/      \/     \/   #
-#                        Zen Minimal Theme                            #
+#                        Zen Minimal Theme                             #
 #                 by Michael Garcia a.k.a. thecrazygm                  #
 #                                                                      #
 #                    https://hive.blog/thecrazygm                      #

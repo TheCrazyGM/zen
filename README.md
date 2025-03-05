@@ -79,6 +79,4 @@ MIT License
 
 ---
 
-<p align="center">
-  [The Crazy GM](https://peakd.com/thecrazygm)
-</p>
+[The Crazy GM](https://peakd.com/thecrazygm)

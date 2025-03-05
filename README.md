@@ -80,5 +80,5 @@ MIT License
 ---
 
 <p align="center">
-  <a href="https://peakd.com/thecrazygm">thecrazygm</a>
+  [The Crazy GM](https://peakd.com/thecrazygm)
 </p>

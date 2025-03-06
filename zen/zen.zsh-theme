@@ -164,12 +164,6 @@ zen_get_prompt() {
   # Git branch information with enhanced status
   echo -n "$(zen_git_status)"
 
-  # Command execution time
-  local exec_time=$(zen_cmd_exec_time)
-  if [[ -n "$exec_time" ]]; then
-    echo -n " ${exec_time} "
-  fi
-
   echo -n "${prompt_end}"
   
   # Prompt symbol changes color based on user privileges and last command status
@@ -182,6 +176,12 @@ zen_get_prompt() {
 
 # Right Prompt
 zen_get_rprompt() {
+  # Command execution time
+  local exec_time=$(zen_cmd_exec_time)
+  if [[ -n "$exec_time" ]]; then
+    echo -n "%F{8}${exec_time}%f "
+  fi
+
   # Return code if non-zero with arrow symbol
   echo -n "%(?..%F{196}‹%?›%f ↵)"
 

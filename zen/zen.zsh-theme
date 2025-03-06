@@ -42,7 +42,7 @@ setopt PROMPT_SUBST
 
 # Function to determine SSH connection and set colors
 zen_get_ssh_status() {
-  if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
+  if [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
     echo "ssh"
   else
     echo "local"
@@ -127,15 +127,15 @@ zen_get_path_display() {
 # Command execution time
 zen_cmd_exec_time() {
   if [[ -v ZEN_THEME_SHOW_EXEC_TIME ]]; then
-    if [ $ZEN_CMD_EXEC_TIME ]; then
+    if [[ -v ZEN_CMD_EXEC_TIME && -n "$ZEN_CMD_EXEC_TIME" ]]; then
       local hours=$(($ZEN_CMD_EXEC_TIME / 3600))
       local minutes=$((($ZEN_CMD_EXEC_TIME - $hours * 3600) / 60))
       local seconds=$(($ZEN_CMD_EXEC_TIME - $hours * 3600 - $minutes * 60))
       local time_str=""
 
-      if [ $hours -gt 0 ]; then
+      if [[ $hours -gt 0 ]]; then
         time_str="${hours}h${minutes}m${seconds}s"
-      elif [ $minutes -gt 0 ]; then
+      elif [[ $minutes -gt 0 ]]; then
         time_str="${minutes}m${seconds}s"
       else
         time_str="${seconds}s"
@@ -152,12 +152,12 @@ preexec() {
 }
 
 precmd() {
-  if [ $ZEN_CMD_START_TIME ]; then
+  if [[ -v ZEN_CMD_START_TIME && -n "$ZEN_CMD_START_TIME" ]]; then
     ZEN_CMD_EXEC_TIME=$(($SECONDS - $ZEN_CMD_START_TIME))
     unset ZEN_CMD_START_TIME
 
     # Only show execution time for commands that take longer than 5 seconds
-    if [ $ZEN_CMD_EXEC_TIME -lt 5 ]; then
+    if [[ $ZEN_CMD_EXEC_TIME -lt 5 ]]; then
       unset ZEN_CMD_EXEC_TIME
     fi
   fi
@@ -231,7 +231,7 @@ zen_get_rprompt() {
   fi
 
   # SSH indicator
-  if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
+  if [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
     echo -n "${ZEN_COLOR_BLUE} [SSH]${ZEN_COLOR_RESET}"
   fi
 }

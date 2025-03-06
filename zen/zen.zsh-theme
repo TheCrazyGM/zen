@@ -11,8 +11,7 @@
 #                        Zen Minimal Theme                             #
 #                 by Michael Garcia a.k.a. thecrazygm                  #
 #                                                                      #
-#                    https://hive.blog/thecrazygm                      #
-#                                                                      #
+#                    https://peakd.com/@thecrazygm                     #
 #======================================================================#
 
 export VIRTUAL_ENV_DISABLE_PROMPT=true
@@ -148,6 +147,18 @@ precmd() {
     fi
   fi
 }
+
+# Color Codes Reference
+# %F{4} - Blue
+# %F{5} - Purple
+# %F{6} - Cyan
+# %F{8} - Gray
+# %F{10} - Green
+# %F{11} - Yellow
+# %F{12} - Light Blue
+# %F{14} - Light Cyan
+# %F{196} - Red
+# %F{214} - Orange
 
 # Prompt
 zen_get_prompt() {

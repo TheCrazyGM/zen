@@ -22,6 +22,8 @@ export VIRTUAL_ENV_DISABLE_PROMPT=true
 # export ZEN_THEME_TWO_LINES=true
 # Uncomment to show command execution time for commands that take longer than 5 seconds
 # export ZEN_THEME_SHOW_EXEC_TIME=true
+# Uncomment to truncate directory paths (0=no truncation, 1=truncate all but last dir, 2+ = show that many dirs)
+# export ZEN_THEME_PATH_TRUNCATE=2
 setopt PROMPT_SUBST
 
 # Function to determine SSH connection and set colors
@@ -87,6 +89,25 @@ zen_git_status() {
     # Output the branch name and all indicators with consistent spacing
     echo -n "${git_color}‹${git_branch}›%f${git_status_symbol}${git_indicators}"
   fi
+}
+
+# Function to display directory with optional truncation
+zen_get_path_display() {
+  local current_path="%~"
+
+  # Apply truncation if enabled
+  if [[ -v ZEN_THEME_PATH_TRUNCATE ]]; then
+    if [[ $ZEN_THEME_PATH_TRUNCATE -eq 1 ]]; then
+      # Show only the current directory
+      current_path="%1~"
+    elif [[ $ZEN_THEME_PATH_TRUNCATE -gt 1 ]]; then
+      # Show limited number of path segments
+      current_path="%$ZEN_THEME_PATH_TRUNCATE~"
+    fi
+  fi
+
+  # Display path with color
+  echo -n "%F{8}${current_path}%f"
 }
 
 # Command execution time
@@ -158,7 +179,7 @@ zen_get_prompt() {
   fi
 
   echo -n "%F{8}:"
-  echo -n "%F{8}%~%f"
+  echo -n "$(zen_get_path_display)"
   echo -n " "
 
   # Git branch information with enhanced status

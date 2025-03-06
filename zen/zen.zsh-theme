@@ -34,8 +34,10 @@ export VIRTUAL_ENV_DISABLE_PROMPT=true
 # export ZEN_THEME_SHOW_TIME=true
 # Uncomment for two-line prompt
 # export ZEN_THEME_TWO_LINES=true
-# Uncomment to show command execution time for commands that take longer than 5 seconds
+# Uncomment to show command execution time for commands that take longer than the threshold
 # export ZEN_THEME_SHOW_EXEC_TIME=true
+# Uncomment to set a custom threshold in seconds (default: 5)
+# export ZEN_THEME_EXEC_TIME_THRESHOLD=2
 # Uncomment to truncate directory paths (0=no truncation, 1=truncate all but last dir, 2+ = show that many dirs)
 # export ZEN_THEME_PATH_TRUNCATE=2
 setopt PROMPT_SUBST
@@ -149,23 +151,31 @@ zen_get_path_display() {
   echo -n "${ZEN_COLOR_GRAY}${current_path}${ZEN_COLOR_RESET}"
 }
 
-# Command execution time
+# Command execution time display with improved formatting
 zen_cmd_exec_time() {
-  if [[ -v ZEN_THEME_SHOW_EXEC_TIME ]]; then
-    if [[ -v ZEN_CMD_EXEC_TIME && -n "$ZEN_CMD_EXEC_TIME" ]]; then
+  # Only process if execution time display is enabled and we have a valid execution time
+  if [[ -v ZEN_THEME_SHOW_EXEC_TIME && -v ZEN_CMD_EXEC_TIME ]]; then
+    # Ensure we have a numeric value
+    if [[ -n "$ZEN_CMD_EXEC_TIME" && "$ZEN_CMD_EXEC_TIME" =~ ^[0-9]+$ ]]; then
+      # Calculate hours, minutes, seconds
       local hours=$(($ZEN_CMD_EXEC_TIME / 3600))
       local minutes=$((($ZEN_CMD_EXEC_TIME - $hours * 3600) / 60))
       local seconds=$(($ZEN_CMD_EXEC_TIME - $hours * 3600 - $minutes * 60))
       local time_str=""
 
+      # Format the time string based on duration
       if [[ $hours -gt 0 ]]; then
+        # Include hours, minutes, seconds
         time_str="${hours}h${minutes}m${seconds}s"
       elif [[ $minutes -gt 0 ]]; then
+        # Include minutes, seconds
         time_str="${minutes}m${seconds}s"
       else
+        # Only seconds
         time_str="${seconds}s"
       fi
 
+      # Output the formatted time string
       echo "${ZEN_COLOR_GRAY}took ${time_str}${ZEN_COLOR_RESET}"
     fi
   fi
@@ -181,8 +191,14 @@ precmd() {
     ZEN_CMD_EXEC_TIME=$(($SECONDS - $ZEN_CMD_START_TIME))
     unset ZEN_CMD_START_TIME
 
-    # Only show execution time for commands that take longer than 5 seconds
-    if [[ $ZEN_CMD_EXEC_TIME -lt 5 ]]; then
+    # Get threshold value or use default of 5 seconds
+    local threshold=5
+    if [[ -v ZEN_THEME_EXEC_TIME_THRESHOLD && -n "$ZEN_THEME_EXEC_TIME_THRESHOLD" ]]; then
+      threshold=$ZEN_THEME_EXEC_TIME_THRESHOLD
+    fi
+
+    # Only show execution time for commands that take longer than the threshold
+    if [[ $ZEN_CMD_EXEC_TIME -lt $threshold ]]; then
       unset ZEN_CMD_EXEC_TIME
     fi
   fi

@@ -18,7 +18,6 @@
 #                          Configuration Options                       #
 #======================================================================#
 
-# Uncomment to show time in prompt
 export VIRTUAL_ENV_DISABLE_PROMPT=true
 # export ZEN_THEME_SHOW_TIME=true
 # export ZEN_THEME_TWO_LINES=true

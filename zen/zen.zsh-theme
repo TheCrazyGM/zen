@@ -42,21 +42,21 @@ zen_git_status() {
     local git_ahead=$(git --no-optional-locks rev-list --count @{upstream}..HEAD 2>/dev/null)
     local git_behind=$(git --no-optional-locks rev-list --count HEAD..@{upstream} 2>/dev/null)
     local git_stash_count=$(git stash list 2>/dev/null | wc -l | tr -d ' ')
-    
+
     # Default color for clean repo
     local git_color="%F{10}"
     local git_status_symbol=""
     local git_indicators=""
-    
+
     # Check if repo has changes
     if [[ -n "$git_status" ]]; then
       # Count different types of changes
       local staged=$(echo "$git_status" | grep -E '^[MADRC]' | wc -l | tr -d ' ')
       local unstaged=$(echo "$git_status" | grep -E '^.[MADRC]' | wc -l | tr -d ' ')
       local untracked=$(echo "$git_status" | grep -E '\?\?' | wc -l | tr -d ' ')
-      
+
       git_color="%F{11}"
-      
+
       # More detailed status indicators with consistent spacing
       if [[ $staged -gt 0 ]]; then
         git_indicators="${git_indicators} %F{10}●${staged}%f "
@@ -70,7 +70,7 @@ zen_git_status() {
     else
       git_status_symbol=" %F{10}✓%f"
     fi
-    
+
     # Add ahead/behind indicators
     if [[ -n "$git_ahead" && "$git_ahead" != "0" ]]; then
       git_indicators="${git_indicators} %F{14}↑${git_ahead}%f "
@@ -78,12 +78,12 @@ zen_git_status() {
     if [[ -n "$git_behind" && "$git_behind" != "0" ]]; then
       git_indicators="${git_indicators} %F{13}↓${git_behind}%f "
     fi
-    
+
     # Add stash indicator
     if [[ "$git_stash_count" != "0" ]]; then
       git_indicators="${git_indicators} %F{6}≡${git_stash_count}%f "
     fi
-    
+
     # Output the branch name and all indicators with consistent spacing
     echo -n "${git_color}‹${git_branch}›%f${git_status_symbol}${git_indicators}"
   fi
@@ -97,7 +97,7 @@ zen_cmd_exec_time() {
       local minutes=$((($ZEN_CMD_EXEC_TIME - $hours * 3600) / 60))
       local seconds=$(($ZEN_CMD_EXEC_TIME - $hours * 3600 - $minutes * 60))
       local time_str=""
-      
+
       if [ $hours -gt 0 ]; then
         time_str="${hours}h${minutes}m${seconds}s"
       elif [ $minutes -gt 0 ]; then
@@ -105,7 +105,7 @@ zen_cmd_exec_time() {
       else
         time_str="${seconds}s"
       fi
-      
+
       echo "%F{8}took ${time_str}%f"
     fi
   fi
@@ -120,7 +120,7 @@ precmd() {
   if [ $ZEN_CMD_START_TIME ]; then
     ZEN_CMD_EXEC_TIME=$(($SECONDS - $ZEN_CMD_START_TIME))
     unset ZEN_CMD_START_TIME
-    
+
     # Only show execution time for commands that take longer than 5 seconds
     if [ $ZEN_CMD_EXEC_TIME -lt 5 ]; then
       unset ZEN_CMD_EXEC_TIME
@@ -133,30 +133,30 @@ zen_get_prompt() {
   local ssh_status=$(zen_get_ssh_status)
   local prompt_start=""
   local prompt_end=""
-  
+
   # Two-line prompt format if enabled
   if [[ -v ZEN_THEME_TWO_LINES ]]; then
     prompt_end="\n"
   fi
-  
+
   echo -n "${prompt_start}"
-  
+
   # Username color changes based on SSH status
   if [[ "$ssh_status" == "ssh" ]]; then
     echo -n "%F{4}%n"  # Blue for SSH
   else
     echo -n "%F{6}%n"  # Cyan for local
   fi
-  
+
   echo -n "%F{8}@"
-  
+
   # Hostname color changes based on SSH status
   if [[ "$ssh_status" == "ssh" ]]; then
     echo -n "%F{5}%m"  # Purple for SSH
   else
     echo -n "%F{12}%m"  # Light blue for local
   fi
-  
+
   echo -n "%F{8}:"
   echo -n "%F{8}%~%f"
   echo -n " "
@@ -165,7 +165,7 @@ zen_get_prompt() {
   echo -n "$(zen_git_status)"
 
   echo -n "${prompt_end}"
-  
+
   # Prompt symbol changes color based on user privileges and last command status
   if [[ $UID -eq 0 ]]; then
     echo -n "%F{196}#%f "  # Red for root
@@ -194,7 +194,7 @@ zen_get_rprompt() {
   if [[ -v ZEN_THEME_SHOW_TIME ]]; then
     echo -n "%F{8} [%D{%H:%M:%S}]%f"
   fi
-  
+
   # SSH indicator
   if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
     echo -n "%F{4} [SSH]%f"

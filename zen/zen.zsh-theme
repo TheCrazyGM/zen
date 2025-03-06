@@ -40,6 +40,21 @@ export VIRTUAL_ENV_DISABLE_PROMPT=true
 # export ZEN_THEME_PATH_TRUNCATE=2
 setopt PROMPT_SUBST
 
+# Helper function for safe git command execution
+zen_safe_git_command() {
+  local default_value="$1"
+  shift
+
+  if ! command -v git >/dev/null 2>&1; then
+    echo "$default_value"
+    return 0
+  fi
+
+  local result
+  result=$(git --no-optional-locks "$@" 2>/dev/null) || result="$default_value"
+  echo "$result"
+}
+
 # Function to determine SSH connection and set colors
 zen_get_ssh_status() {
   if [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]]; then
@@ -51,13 +66,23 @@ zen_get_ssh_status() {
 
 # Git status with better indicators
 zen_git_status() {
-  local git_branch=$(git --no-optional-locks rev-parse --abbrev-ref HEAD 2>/dev/null)
+  # Get branch name, return early if not in a git repo
+  local git_branch=$(zen_safe_git_command "" rev-parse --abbrev-ref HEAD)
+  if [[ -z "$git_branch" ]]; then
+    return 0
+  fi
+
   if [[ -n "$git_branch" ]]; then
-    # Get various git statuses
-    local git_status=$(git --no-optional-locks status --porcelain 2>/dev/null)
-    local git_ahead=$(git --no-optional-locks rev-list --count @{upstream}..HEAD 2>/dev/null)
-    local git_behind=$(git --no-optional-locks rev-list --count HEAD..@{upstream} 2>/dev/null)
-    local git_stash_count=$(git stash list 2>/dev/null | wc -l | tr -d ' ')
+    # Get various git statuses with proper error handling using our helper function
+    local git_status=$(zen_safe_git_command "" status --porcelain)
+    local git_ahead=$(zen_safe_git_command "0" rev-list --count @{upstream}..HEAD)
+    local git_behind=$(zen_safe_git_command "0" rev-list --count HEAD..@{upstream})
+
+    # Special handling for stash count which requires piping
+    local git_stash_count="0"
+    if command -v git >/dev/null 2>&1; then
+      git_stash_count=$(git stash list 2>/dev/null | wc -l | tr -d ' ') || git_stash_count="0"
+    fi
 
     # Default color for clean repo
     local git_color="${ZEN_COLOR_GREEN}"

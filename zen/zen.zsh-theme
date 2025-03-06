@@ -59,13 +59,13 @@ zen_git_status() {
       
       # More detailed status indicators with consistent spacing
       if [[ $staged -gt 0 ]]; then
-        git_indicators="${git_indicators} %F{10}●${staged}%f"
+        git_indicators="${git_indicators} %F{10}●${staged}%f "
       fi
       if [[ $unstaged -gt 0 ]]; then
-        git_indicators="${git_indicators} %F{11}●${unstaged}%f"
+        git_indicators="${git_indicators} %F{11}●${unstaged}%f "
       fi
       if [[ $untracked -gt 0 ]]; then
-        git_indicators="${git_indicators} %F{8}●${untracked}%f"
+        git_indicators="${git_indicators} %F{8}●${untracked}%f "
       fi
     else
       git_status_symbol=" %F{10}✓%f"
@@ -73,15 +73,15 @@ zen_git_status() {
     
     # Add ahead/behind indicators
     if [[ -n "$git_ahead" && "$git_ahead" != "0" ]]; then
-      git_indicators="${git_indicators} %F{14}↑${git_ahead}%f"
+      git_indicators="${git_indicators} %F{14}↑${git_ahead}%f "
     fi
     if [[ -n "$git_behind" && "$git_behind" != "0" ]]; then
-      git_indicators="${git_indicators} %F{13}↓${git_behind}%f"
+      git_indicators="${git_indicators} %F{13}↓${git_behind}%f "
     fi
     
     # Add stash indicator
     if [[ "$git_stash_count" != "0" ]]; then
-      git_indicators="${git_indicators} %F{6}≡${git_stash_count}%f"
+      git_indicators="${git_indicators} %F{6}≡${git_stash_count}%f "
     fi
     
     # Output the branch name and all indicators with consistent spacing
@@ -167,7 +167,7 @@ zen_get_prompt() {
   # Command execution time
   local exec_time=$(zen_cmd_exec_time)
   if [[ -n "$exec_time" ]]; then
-    echo -n " ${exec_time}"
+    echo -n " ${exec_time} "
   fi
 
   echo -n "${prompt_end}"
@@ -218,8 +218,8 @@ fi
 # ZSH Theme configuration for compatibility with plugins
 ZSH_THEME_GIT_PROMPT_PREFIX="%F{220}% ‹"
 ZSH_THEME_GIT_PROMPT_SUFFIX="›%f"
-ZSH_THEME_GIT_PROMPT_DIRTY="%F{11} ✗"
-ZSH_THEME_GIT_PROMPT_CLEAN="%F{10} ✓"
+ZSH_THEME_GIT_PROMPT_DIRTY="%F{11}✗ "
+ZSH_THEME_GIT_PROMPT_CLEAN="%F{10}✓ "
 
 ZSH_THEME_VIRTUAL_ENV_PROMPT_PREFIX="%F{202}% ["
 ZSH_THEME_VIRTUAL_ENV_PROMPT_SUFFIX="]%f"

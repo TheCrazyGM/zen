@@ -14,6 +14,21 @@
 #                    https://peakd.com/@thecrazygm                     #
 #======================================================================#
 
+# Color definitions
+ZEN_COLOR_BLUE="%F{4}"          # Blue - SSH username
+ZEN_COLOR_PURPLE="%F{5}"        # Purple - SSH hostname
+ZEN_COLOR_CYAN="%F{6}"          # Cyan - Local username, stash count
+ZEN_COLOR_GRAY="%F{8}"          # Gray - Separator, path, time
+ZEN_COLOR_GREEN="%F{10}"        # Green - Clean repo, staged changes
+ZEN_COLOR_YELLOW="%F{11}"       # Yellow - Dirty repo, unstaged changes
+ZEN_COLOR_LIGHT_BLUE="%F{12}"   # Light blue - Local hostname
+ZEN_COLOR_LIGHT_CYAN="%F{14}"   # Light cyan - Ahead indicator
+ZEN_COLOR_MAGENTA="%F{13}"      # Magenta - Behind indicator
+ZEN_COLOR_RED="%F{196}"         # Red - Root prompt, error code
+ZEN_COLOR_ORANGE="%F{214}"      # Orange - Normal prompt
+ZEN_COLOR_DEEP_ORANGE="%F{202}" # Deep orange - Virtual env
+ZEN_COLOR_RESET="%f"            # Reset color
+
 export VIRTUAL_ENV_DISABLE_PROMPT=true
 # Uncomment to show time in prompt
 # export ZEN_THEME_SHOW_TIME=true
@@ -45,7 +60,7 @@ zen_git_status() {
     local git_stash_count=$(git stash list 2>/dev/null | wc -l | tr -d ' ')
 
     # Default color for clean repo
-    local git_color="%F{10}"
+    local git_color="${ZEN_COLOR_GREEN}"
     local git_status_symbol=""
     local git_indicators=""
 
@@ -56,33 +71,33 @@ zen_git_status() {
       local unstaged=$(echo "$git_status" | grep -E '^.[MADRC]' | wc -l | tr -d ' ')
       local untracked=$(echo "$git_status" | grep -E '\?\?' | wc -l | tr -d ' ')
 
-      git_color="%F{11}"
+      git_color="${ZEN_COLOR_YELLOW}"
 
       # More detailed status indicators with consistent spacing
       if [[ $staged -gt 0 ]]; then
-        git_indicators="${git_indicators} %F{10}●${staged}%f "
+        git_indicators="${git_indicators} ${ZEN_COLOR_GREEN}●${staged}${ZEN_COLOR_RESET} "
       fi
       if [[ $unstaged -gt 0 ]]; then
-        git_indicators="${git_indicators} %F{11}●${unstaged}%f "
+        git_indicators="${git_indicators} ${ZEN_COLOR_YELLOW}●${unstaged}${ZEN_COLOR_RESET} "
       fi
       if [[ $untracked -gt 0 ]]; then
-        git_indicators="${git_indicators} %F{8}●${untracked}%f "
+        git_indicators="${git_indicators} ${ZEN_COLOR_GRAY}●${untracked}${ZEN_COLOR_RESET} "
       fi
     else
-      git_status_symbol=" %F{10}✓%f"
+      git_status_symbol=" ${ZEN_COLOR_GREEN}✓${ZEN_COLOR_RESET}"
     fi
 
     # Add ahead/behind indicators
     if [[ -n "$git_ahead" && "$git_ahead" != "0" ]]; then
-      git_indicators="${git_indicators} %F{14}↑${git_ahead}%f "
+      git_indicators="${git_indicators} ${ZEN_COLOR_LIGHT_CYAN}↑${git_ahead}${ZEN_COLOR_RESET} "
     fi
     if [[ -n "$git_behind" && "$git_behind" != "0" ]]; then
-      git_indicators="${git_indicators} %F{13}↓${git_behind}%f "
+      git_indicators="${git_indicators} ${ZEN_COLOR_MAGENTA}↓${git_behind}${ZEN_COLOR_RESET} "
     fi
 
     # Add stash indicator
     if [[ "$git_stash_count" != "0" ]]; then
-      git_indicators="${git_indicators} %F{6}≡${git_stash_count}%f "
+      git_indicators="${git_indicators} ${ZEN_COLOR_CYAN}≡${git_stash_count}${ZEN_COLOR_RESET} "
     fi
 
     # Output the branch name and all indicators with consistent spacing
@@ -106,7 +121,7 @@ zen_get_path_display() {
   fi
 
   # Display path with color
-  echo -n "%F{8}${current_path}%f"
+  echo -n "${ZEN_COLOR_GRAY}${current_path}${ZEN_COLOR_RESET}"
 }
 
 # Command execution time
@@ -126,7 +141,7 @@ zen_cmd_exec_time() {
         time_str="${seconds}s"
       fi
 
-      echo "%F{8}took ${time_str}%f"
+      echo "${ZEN_COLOR_GRAY}took ${time_str}${ZEN_COLOR_RESET}"
     fi
   fi
 }
@@ -148,18 +163,6 @@ precmd() {
   fi
 }
 
-# Color Codes Reference
-# %F{4} - Blue
-# %F{5} - Purple
-# %F{6} - Cyan
-# %F{8} - Gray
-# %F{10} - Green
-# %F{11} - Yellow
-# %F{12} - Light Blue
-# %F{14} - Light Cyan
-# %F{196} - Red
-# %F{214} - Orange
-
 # Prompt
 zen_get_prompt() {
   local ssh_status=$(zen_get_ssh_status)
@@ -175,21 +178,21 @@ zen_get_prompt() {
 
   # Username color changes based on SSH status
   if [[ "$ssh_status" == "ssh" ]]; then
-    echo -n "%F{4}%n"  # Blue for SSH
+    echo -n "${ZEN_COLOR_BLUE}%n"  # Blue for SSH
   else
-    echo -n "%F{6}%n"  # Cyan for local
+    echo -n "${ZEN_COLOR_CYAN}%n"  # Cyan for local
   fi
 
-  echo -n "%F{8}@"
+  echo -n "${ZEN_COLOR_GRAY}@"
 
   # Hostname color changes based on SSH status
   if [[ "$ssh_status" == "ssh" ]]; then
-    echo -n "%F{5}%m"  # Purple for SSH
+    echo -n "${ZEN_COLOR_PURPLE}%m"  # Purple for SSH
   else
-    echo -n "%F{12}%m"  # Light blue for local
+    echo -n "${ZEN_COLOR_LIGHT_BLUE}%m"  # Light blue for local
   fi
 
-  echo -n "%F{8}:"
+  echo -n "${ZEN_COLOR_GRAY}:"
   echo -n "$(zen_get_path_display)"
   echo -n " "
 
@@ -200,9 +203,9 @@ zen_get_prompt() {
 
   # Prompt symbol changes color based on user privileges and last command status
   if [[ $UID -eq 0 ]]; then
-    echo -n "%F{196}#%f "  # Red for root
+    echo -n "${ZEN_COLOR_RED}#${ZEN_COLOR_RESET} "  # Red for root
   else
-    echo -n "%(?.%F{214}.%F{1})$%f "  # Orange for normal user, red if last command failed
+    echo -n "%(?.${ZEN_COLOR_ORANGE}.${ZEN_COLOR_RED})\$${ZEN_COLOR_RESET} "  # Orange for normal user, red if last command failed
   fi
 }
 
@@ -211,25 +214,25 @@ zen_get_rprompt() {
   # Command execution time
   local exec_time=$(zen_cmd_exec_time)
   if [[ -n "$exec_time" ]]; then
-    echo -n "%F{8}${exec_time}%f "
+    echo -n "${ZEN_COLOR_GRAY}${exec_time}${ZEN_COLOR_RESET} "
   fi
 
   # Return code if non-zero with arrow symbol
-  echo -n "%(?..%F{196}‹%?›%f ↵)"
+  echo -n "%(?..${ZEN_COLOR_RED}‹%?›${ZEN_COLOR_RESET} ↵)"
 
   # Virtual environment indicator
   if [[ -v VIRTUAL_ENV ]]; then
-    echo -n "%F{202} ["$(basename "$VIRTUAL_ENV")"]%f"
+    echo -n "${ZEN_COLOR_DEEP_ORANGE} ["$(basename "$VIRTUAL_ENV")"]${ZEN_COLOR_RESET}"
   fi
 
   # Time display if enabled
   if [[ -v ZEN_THEME_SHOW_TIME ]]; then
-    echo -n "%F{8} [%D{%H:%M:%S}]%f"
+    echo -n "${ZEN_COLOR_GRAY} [%D{%H:%M:%S}]${ZEN_COLOR_RESET}"
   fi
 
   # SSH indicator
   if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
-    echo -n "%F{4} [SSH]%f"
+    echo -n "${ZEN_COLOR_BLUE} [SSH]${ZEN_COLOR_RESET}"
   fi
 }
 
@@ -248,12 +251,12 @@ if ! (( $+functions[virtualenv_prompt_info] )); then
 fi
 
 # ZSH Theme configuration for compatibility with plugins
-ZSH_THEME_GIT_PROMPT_PREFIX="%F{220}% ‹"
-ZSH_THEME_GIT_PROMPT_SUFFIX="›%f"
-ZSH_THEME_GIT_PROMPT_DIRTY="%F{11}✗ "
-ZSH_THEME_GIT_PROMPT_CLEAN="%F{10}✓ "
+ZSH_THEME_GIT_PROMPT_PREFIX="${ZEN_COLOR_ORANGE}% ‹"
+ZSH_THEME_GIT_PROMPT_SUFFIX="›${ZEN_COLOR_RESET}"
+ZSH_THEME_GIT_PROMPT_DIRTY="${ZEN_COLOR_YELLOW}✗ "
+ZSH_THEME_GIT_PROMPT_CLEAN="${ZEN_COLOR_GREEN}✓ "
 
-ZSH_THEME_VIRTUAL_ENV_PROMPT_PREFIX="%F{202}% ["
-ZSH_THEME_VIRTUAL_ENV_PROMPT_SUFFIX="]%f"
+ZSH_THEME_VIRTUAL_ENV_PROMPT_PREFIX="${ZEN_COLOR_DEEP_ORANGE}% ["
+ZSH_THEME_VIRTUAL_ENV_PROMPT_SUFFIX="]${ZEN_COLOR_RESET}"
 ZSH_THEME_VIRTUALENV_PREFIX=$ZSH_THEME_VIRTUAL_ENV_PROMPT_PREFIX
 ZSH_THEME_VIRTUALENV_SUFFIX=$ZSH_THEME_VIRTUAL_ENV_PROMPT_SUFFIX
